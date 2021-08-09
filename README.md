@@ -22,6 +22,7 @@ The goal is to expose all of [alexa-remote2](https://www.npmjs.com/package/alexa
    | USA | pitangui.amazon.com | amazon.com    | en-US    |
    | UK  | alexa.amazon.co.uk  | amazon.co.uk  | en-UK    |
    | GER | layla.amazon.de     | amazon.de     | de-DE    |
+   | FR  | layla.amazon.de     | amazon.fr     | de-DE    |
    | ITA | alexa.amazon.it     | amazon.it     | it-IT    |
    | AUS | alexa.amazon.com.au | amazon.com.au | en-US    |
 
