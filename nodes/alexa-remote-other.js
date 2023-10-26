@@ -38,7 +38,7 @@ module.exports = function (RED) {
 
 						case 'activities': 			
 							if(!tools.matches(value, { count: 10, offset: 1 })) return error(`invalid input: "${JSON.stringify(config)}"`);
-							return alexa.getActivitiesPromise({ size: value.count, offset: value.offset }).then(send).catch(error);
+							return alexa.getCustomerHistoryRecordsPromise({ size: value.count, offset: value.offset }).then(send).catch(error);
 
 						case 'cards':				
 							if(!tools.matches(value, { count: 10 })) return error(`invalid input: "${JSON.stringify(config)}"`);
