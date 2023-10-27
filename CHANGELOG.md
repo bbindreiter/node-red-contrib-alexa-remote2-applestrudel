@@ -1,4 +1,6 @@
 **node-red-contrib-alexa-remote2-applestrudel**
+- **5.0.44**
+  - Get activities fix by @DanPatten
 - **5.0.43**
   - Double init fix by @DanPatten
 - **5.0.42**
