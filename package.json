@@ -1,6 +1,6 @@
 {
 	"name": "node-red-contrib-alexa-remote2-applestrudel",
-	"version": "5.0.45",
+	"version": "5.0.46",
 	"author": {
 		"name": "bbindreiter",
 		"email": "bernd.bindreiter@gmail.com"
@@ -47,7 +47,7 @@
 		"url": "https://github.com/bbindreiter/node-red-contrib-alexa-remote2-applestrudel/issues"
 	},
 	"dependencies": {
-		"alexa-remote2": "^6.2.0"
+		"alexa-remote2": "^6.2.2"
 	},
 	"engines": {
 		"node": ">=16.0.0"
