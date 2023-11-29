@@ -1,6 +1,6 @@
 {
 	"name": "node-red-contrib-alexa-remote2-applestrudel",
-	"version": "5.0.46",
+	"version": "5.0.48",
 	"author": {
 		"name": "bbindreiter",
 		"email": "bernd.bindreiter@gmail.com"
@@ -17,6 +17,14 @@
 		{
 			"name": "DanPatten",
 			"url": "https://github.com/DanPatten"
+		},
+		{
+			"name": "jonferreira",
+			"url": "https://github.com/jonferreira"
+		},
+		{
+			"name": "abstract-entity",
+			"url": "https://github.com/abstract-entity"
 		}
 	],
 	"description": "node-red nodes for interacting with alexa",
@@ -47,7 +55,7 @@
 		"url": "https://github.com/bbindreiter/node-red-contrib-alexa-remote2-applestrudel/issues"
 	},
 	"dependencies": {
-		"alexa-remote2": "^6.2.2"
+		"alexa-remote2": "^7.0.2"
 	},
 	"engines": {
 		"node": ">=16.0.0"

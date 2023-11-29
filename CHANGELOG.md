@@ -1,4 +1,10 @@
 **node-red-contrib-alexa-remote2-applestrudel**
+- **5.0.48**
+  - Fix authentication to amazon alexa by @abstract-entity
+  - Updates dependency alexa-remote2 to v7.0.2
+- **5.0.47**
+  - Null check fix by @jonferreira
+  - Updates dependency alexa-remote2 to v7.0.0 
 - **5.0.46**
   - Updates dependency alexa-remote2 to v6.2.2
 - **5.0.45**
