@@ -25,9 +25,9 @@
 			<option value="ws-equilizer-state-change"	>Equalizer State Change		</option>	
 			<option value="ws-notification-change"		>Notification Change		</option>	
 			<option value="ws-device-activity"			>Device Activity			</option>	
-			<option value="ws-todo-change"				>List Change				</option>	
+			<option value="ws-todo-change"				>Todo List Change			</option>	
 			<option value="ws-unknown-command"			>Unknown Command			</option>	
-			<option value="command"						>All Events (RAW)			</option>	
+			<option value="command"						>All Events (raw data)		</option>	
 		</select>
 	</div>
 </script>
@@ -75,14 +75,12 @@
 		icon: 'alexa-remote-icon.png',
 		paletteLabel: 'Alexa Event',
 		label: function () {
-			function keyToLabel(str) {
-					if (str == 'mand') return "any event (raw)";
-					const match = str.match(/(?:[A-Z]?[a-z]+)|[A-Z]|[0-9]+/g);
-					if (match) str = match.map(s => s.slice(0, 1).toUpperCase() + s.slice(1)).join(' ');
-					return str;
-			}
-			
-			return this.name || `On ${keyToLabel(this.event.slice(3))}`;
+			if (this.name) return this.name;
+			if (this.event == 'command') return 'On any event (raw data)';
+
+			const match = this.event.slice(3).match(/(?:[A-Z]?[a-z]+)|[A-Z]|[0-9]+/g);
+			str = match.map(s => s.slice(0, 1).toUpperCase() + s.slice(1)).join(' ');
+			return `On ${str}`;
 		},
 		labelStyle: function () {
 			return this.name ? "node_label_italic" : "";
