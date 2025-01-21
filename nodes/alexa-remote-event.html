@@ -79,7 +79,7 @@
 			if (this.event == 'command') return 'On any event (raw data)';
 
 			const match = this.event.slice(3).match(/(?:[A-Z]?[a-z]+)|[A-Z]|[0-9]+/g);
-			str = match.map(s => s.slice(0, 1).toUpperCase() + s.slice(1)).join(' ');
+			var str = match.map(s => s.slice(0, 1).toUpperCase() + s.slice(1)).join(' ');
 			return `On ${str}`;
 		},
 		labelStyle: function () {
