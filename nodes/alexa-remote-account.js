@@ -247,19 +247,19 @@ const uiJsonBuilders = {
 	},
 	lists: async (alexa, fresh = true) => {
 		function getIcon(list) {
-			switch(list.type) {
-				case 'SHOPPING_LIST': return 'f07a'; // shopping-cart
-				case 'TO_DO':         return 'f14a'; // check-square
+			switch(list.listType) {
+				case 'SHOP':          return 'f07a'; // shopping-cart
+				case 'TODO':          return 'f14a'; // check-square
 				default:              return 'f03a'; // list
 			}
 		}
 	
 		function getName(list) {
-			if(list.name) return list.name;
+			if(list.listName) return list.listName;
 	
-			switch(list.type) {
-				case 'SHOPPING_LIST': return 'Shopping';
-				case 'TO_DO':         return 'To-do';
+			switch(list.listType) {
+				case 'SHOP':          return 'Shopping';
+				case 'TODO':          return 'To-do';
 				default:              return 'Unnamed';
 			}
 		}
@@ -268,9 +268,9 @@ const uiJsonBuilders = {
 			return `&#x${getIcon(list)};  ${getName(list)}`;
 		}
 	
-		return JSON.stringify((await alexa.getListsPromise())
-			.filter(x => x.archived == false)
-			.map(x => [x.itemId, getLabel(x)])
+		return JSON.stringify((await alexa.getListsV2Promise())
+			.filter(x => x.listStatus == 'ACTIVE')
+			.map(x => [x.listId, getLabel(x)])
 		);
 	},
 };
