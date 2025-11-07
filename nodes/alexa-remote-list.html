@@ -902,14 +902,16 @@
 						});
 					},
 					removeItem: function(data) {
-						data = template(data, { list: {type: 'str', value:''}, item: {type: 'str', value:''} });
+						data = template(data, { list: {type: 'str', value: ''}, item: {type: 'str', value: ''}, version: {type:'num', value: '1'} });
 
             const list = listWidget(this, data.list);
 						const item = itemWidget(this, data.item);
+						const version = versionWidget(this, data.version);
 						
 						return () => ({ 
 							list: list.arTypedInputOrSelect('data'), 
 							item: item.arTypedInput('data'),
+							version: version.arTypedInput('data'),
 						});
 					},
 				});
