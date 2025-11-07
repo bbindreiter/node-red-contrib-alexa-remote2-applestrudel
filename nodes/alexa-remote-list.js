@@ -20,7 +20,7 @@ module.exports = function (RED) {
 			
 			switch(option) {
 				case 'getLists': 
-				return alexa.getListsPromise().then(send).catch(error);
+				return alexa.getListsV2Promise().then(send).catch(error);
 				
         case 'getList':
 					if(!tools.matches(value, { list: '' })) return error(`expected a string 'list'`);
@@ -41,8 +41,8 @@ module.exports = function (RED) {
 					return alexa.updateListItemPromise(value.list, value.item, options).then(send).catch(error);
 
 				case 'removeItem':
-					if(!tools.matches(value, { list: '', item: '' })) return error(`expected a string 'list' and 'item'`);
-					return alexa.deleteListItemPromise(value.list, value.item).then(send).catch(error);
+					if(!tools.matches(value, { list: '', item: '', version: 0 })) return error(`expected a string 'list', 'item' and number 'version'`);
+					return alexa.deleteListItemPromise(value.list, value.item, { version: value.version }).then(send).catch(error);
 
 				default:
 					return error('invalid option');
