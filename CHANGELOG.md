@@ -1,4 +1,6 @@
 **node-red-contrib-alexa-remote2-applestrudel**
+- **5.0.55**
+  - fix: Get Lists and Remove List Item https://github.com/bbindreiter/node-red-contrib-alexa-remote2-applestrudel/pull/235
 - **5.0.54**
   - Updates dependency alexa-remote2 to v8.0.4"
   - Fix authentication
