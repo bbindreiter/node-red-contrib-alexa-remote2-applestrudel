@@ -1,9 +1,9 @@
 # node-red-contrib-alexa-remote2-applestrudel
 
-[![npm](https://img.shields.io/npm/v/node-red-contrib-alexa-remote2-applestrudel.svg)](https://www.npmjs.com/package/node-red-contrib-alexa-remote2-applestrudel)  [![downloads](http[s://img.shields.io/npm/dt/node-red-contrib-alexa-remote2-applestrudel.svg)](https://www.npmjs.com/package/node-red-contrib-alexa-remote2-applestrudel)
+[![npm](https://img.shields.io/npm/v/node-red-contrib-alexa-remote2-applestrudel.svg)](https://www.npmjs.com/package/node-red-contrib-alexa-remote2-applestrudel) [![downloads](https://img.shields.io/npm/dt/node-red-contrib-alexa-remote2-applestrudel.svg)](https://www.npmjs.com/package/node-red-contrib-alexa-remote2-applestrudel)
 
 
-> Forked from [bbindreiter/node-red-contrib-alexa-remote2-applestrudel](https://github.com/bbindreiter/node-red-contrib-alexa-remote2-applestrudel) via [cakebake/node-red-contrib-alexa-remote-cakebaked](https://github.com/cakebake/node-red-contrib-alexa-remote-cakebaked) which was forked from [586837r/node-red-contrib-alexa-remote2](https://github.com/586837r/node-red-contrib-alexa-remote2) to implement OAuth authorisation and keep dependencies up to date.
+> Forked from [cakebake/node-red-contrib-alexa-remote-cakebaked](https://github.com/cakebake/node-red-contrib-alexa-remote-cakebaked) which was forked from [586837r/node-red-contrib-alexa-remote2](https://github.com/586837r/node-red-contrib-alexa-remote2) to keep dependencies up to date.
 
 This is a collection of Node-RED nodes for interacting with the Alexa API.
 You can emulate routine behaviour, control and query your devices and much more!
