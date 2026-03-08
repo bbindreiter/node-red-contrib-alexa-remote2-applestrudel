@@ -63,7 +63,8 @@
 		"url": "https://github.com/bbindreiter/node-red-contrib-alexa-remote2-applestrudel/issues"
 	},
 	"dependencies": {
-		"alexa-remote2": "^8.0.4"
+		"alexa-remote2": "^8.0.4",
+		"tough-cookie": "^5.1.1"
 	},
 	"engines": {
 		"node": ">=16.0.0"

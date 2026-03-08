@@ -314,7 +314,7 @@ module.exports = function (RED) {
 		this.refreshInterval = Number(this.refreshInterval) * 1000 * 60 * 60 * 24;
 		if(this.refreshInterval < 15000) this.refreshInterval = NaN;
 
-		this.alexa = new AlexaRemote().setMaxListeners(32);
+		this.alexa = new AlexaRemote({ context: this.context() }).setMaxListeners(32);
 		this.emitter = new EventEmitter().setMaxListeners(128);
 		this.initing = false;
 		this.state = { code: 'UNINITIALISED', message: '' };
@@ -392,7 +392,7 @@ module.exports = function (RED) {
 			if (!this.alexa) return;
 			this.alexa.resetExt();
 			this.initialised = false;
-			this.alexa = new AlexaRemote();
+			this.alexa = new AlexaRemote({ context: this.context() });
 
       this.ui.smarthome      = JSON.stringify({ entityById: {}, colorNames: [], colorTemperatureNames: []});
       this.ui.devices        = JSON.stringify([]);
@@ -484,7 +484,7 @@ module.exports = function (RED) {
 				});
 			}
 
-			const cookieData = await alexa.initExt(config, proxyWaitCallback, this.warnCb).catch(error => {
+			const cookieData = await alexa.initExt(config, proxyWaitCallback, this.warnCb, this.errorCb).catch(error => {
 				if(alexa !== this.alexa) return;
 				this.setState('ERROR', error && error.message);
 				this.initing = false;

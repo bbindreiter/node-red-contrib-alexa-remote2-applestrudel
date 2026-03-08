@@ -1,4 +1,6 @@
 **node-red-contrib-alexa-remote2-applestrudel**
+- **5.0.56**
+  - fix: Refactoring alexa-remote-ext to use OAuth Login
 - **5.0.55**
   - fix: Get Lists and Remove List Item https://github.com/bbindreiter/node-red-contrib-alexa-remote2-applestrudel/pull/235
 - **5.0.54**
