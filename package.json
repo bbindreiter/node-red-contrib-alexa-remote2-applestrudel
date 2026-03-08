@@ -34,14 +34,14 @@
 			"name": "nana4rider",
 			"url": "https://github.com/nana4rider"
 		},
-        {
-            "name": "George Talusan",
-            "url": "https://github.com/gtalusan"
-        },
-        {
-            "name": "Marian T.",
-            "url": "https://github.com/manni-2x"
-        }
+		{
+			"name": "George Talusan",
+			"url": "https://github.com/gtalusan"
+		},
+		{
+			"name": "Marian T.",
+			"url": "https://github.com/manni-2x"
+		}
 	],
 	"description": "node-red nodes for interacting with alexa",
 	"keywords": [
@@ -65,7 +65,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/bbindreiter/node-red-contrib-alexa-remote2-applestrudel"
+		"url": "git+https://github.com/bbindreiter/node-red-contrib-alexa-remote2-applestrudel.git"
 	},
 	"bugs": {
 		"url": "https://github.com/bbindreiter/node-red-contrib-alexa-remote2-applestrudel/issues"
