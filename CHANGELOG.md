@@ -1,4 +1,6 @@
 **node-red-contrib-alexa-remote2-applestrudel**
+- **5.0.58**
+    - persistent cookie auth fix by @gtalusan
 - **5.0.57**
     - oauth fix by @gtalusan and @manni-2x
 - **5.0.56**
