@@ -328,6 +328,18 @@ module.exports = function (RED) {
 		this.errorMessages = {};
 		this.ui = {};
 		this.builders = {};
+		this.persistCookieData = () => {
+			if (this.authMethod !== 'proxy' || !this.cookieFile || !this.alexa || !this.alexa.cookieData) return;
+			const json = JSON.stringify(this.alexa.cookieData);
+			try { fs.writeFileSync(this.cookieFile, json, 'utf8'); }
+			catch (error) { this.warnCb(error); }
+		};
+		this.attachAlexaHandlers = () => {
+			if (!this.alexa) return;
+			this.alexa.on('cookie', () => this.persistCookieData());
+		};
+
+		this.attachAlexaHandlers();
 
 		this.buildUiErrorJson = async () => {
 			const a = this.errorMessages;
@@ -392,7 +404,8 @@ module.exports = function (RED) {
 			if (!this.alexa) return;
 			this.alexa.resetExt();
 			this.initialised = false;
-			this.alexa = new AlexaRemote({ context: this.context() });
+			this.alexa = new AlexaRemote({ context: this.context() }).setMaxListeners(32);
+			this.attachAlexaHandlers();
 
       this.ui.smarthome      = JSON.stringify({ entityById: {}, colorNames: [], colorTemperatureNames: []});
       this.ui.devices        = JSON.stringify([]);
@@ -420,7 +433,6 @@ module.exports = function (RED) {
 			config.logger = this.debugCb;
 			config.refreshCookieInterval = 0;
 			config.proxyLogLevel = 'warn';
-			config.cookieJustCreated = true; // otherwise it just tries forever...
 			config.bluetooth = false;
 			config.setupProxy = false;
 			config.apiUserAgentPostfix = pjson.name + '/' + pjson.version;
@@ -434,12 +446,15 @@ module.exports = function (RED) {
 						 || undefined;
 
 					config.cookie = cookieData;
+					config.cookieJustCreated = !cookieData;
 					break;
 				case 'cookie':
 					tools.assign(config, ['cookie'], this.credentials);
+					config.cookieJustCreated = false;
 					break;
 				case 'password':
 					tools.assign(config, ['email', 'password'], this.credentials);
+					config.cookieJustCreated = false;
 					break;
 			}
 
@@ -498,10 +513,7 @@ module.exports = function (RED) {
 			}
 
 			if(this.authMethod === 'proxy' && this.cookieFile) {
-				const data = alexa.cookieData;
-				const json = JSON.stringify(data);
-				try { fs.writeFileSync(this.cookieFile, json, 'utf8'); }
-				catch (error) { this.warnCb(error); }
+				this.persistCookieData();
 			}
 			
 			await this.buildUiJson(false);
