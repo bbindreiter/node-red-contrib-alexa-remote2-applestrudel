@@ -7,7 +7,6 @@ module.exports = function (RED) {
 		tools.assignNode(RED, this, ['account'], input);
 		if (!tools.nodeSetup(this, input, true)) return;
 
-		const debug = tools.nodeGetDebugCb(this);
 		const log = tools.nodeGetLogCb(this);
 		const warn = tools.nodeGetWarnCb(this);
 		const error = tools.nodeGetErrorCb(this);
@@ -382,9 +381,9 @@ module.exports = function (RED) {
 							payload: {
 								type: 'parallel',
 								children: devices.map(device => ({
-									type: 'prompt',
+									type: 'phrase',
 									payload: {
-										type: node.payload.type,
+										category: node.payload.category,
 										device: device,
 									}
 								}))
@@ -501,9 +500,9 @@ module.exports = function (RED) {
 						checkPayload({ device: undefined, provider: '', search: '' });
 						const device = find(node.payload.device);
 
-						var searchPhrase = node.payload.search;
-						var deviceType = device.deviceType;
-						var deviceSerialNumber = device.serialNumber;
+						let searchPhrase = node.payload.search;
+						let deviceType = device.deviceType;
+						let deviceSerialNumber = device.serialNumber;
 
 						if (device.deviceFamily == 'WHA') {
 							const firstClusterDevice = find(device.clusterMembers[0]);

@@ -1,5 +1,4 @@
 const tools = require('../lib/common.js');
-const util = require('util');
 const convert = require('../lib/color-convert.js');
 
 module.exports = function (RED) {
@@ -79,8 +78,8 @@ module.exports = function (RED) {
 							stateById.set(simplified.id, simplified);
 						}
 
-						for(const error of response.errors) {
-							errorById.set(error.entity.entityId, error);
+						for(const errEntry of response.errors) {
+							errorById.set(errEntry.entity.entityId, errEntry);
 						}
 
 						// tools.log({states: stateById, errors: errorById});
@@ -239,8 +238,8 @@ module.exports = function (RED) {
 							controlResponseById.set(controlResponse.entityId, controlResponse);
 						}
 
-						for(const error of response.errors) {
-							errorById.set(error.entity.entityId, error);
+						for(const errEntry of response.errors) {
+							errorById.set(errEntry.entity.entityId, errEntry);
 						}
 
 						const msgs = inputs.map((input, i) => {

@@ -1,14 +1,5 @@
 const tools = require('../lib/common.js');
 
-function findByDevice(list, device) {
-	const found = list.find(o => o.deviceSerialNumber === device.serialNumber);
-	if(!found) throw new Error(`no response for device: "${device.accountName}" (${device.serialNumber})`);
-	return found;
-}
-
-function filterByDevice(list, device) {
-	return list.filter(n => n.deviceSerialNumber === device.serialNumber);
-}
 
 module.exports = function (RED) {
 

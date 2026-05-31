@@ -344,7 +344,7 @@ module.exports = function (RED) {
 		this.buildUiErrorJson = async () => {
 			const a = this.errorMessages;
 			const b = this.alexa.errorMessagesExt;
-			const keys = new Set(Object.getOwnPropertyNames(a), Object.getOwnPropertyNames(b));
+			const keys = new Set([...Object.getOwnPropertyNames(a), ...Object.getOwnPropertyNames(b)]);
 			const combined = {};
 
 			for(const key of keys) {

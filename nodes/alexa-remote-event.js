@@ -33,9 +33,8 @@ module.exports = function (RED) {
 		}
 
 		this.on('close', function() {
-			this.account.emitter.removeListener('status', this.onStatus);
-			this.account.alexa.removeListener(this.event, this.onAlexaEvent);
 			this.account.emitter.removeListener('state', this.onStatus);
+			this.account.alexa.removeListener(this.event, this.onAlexaEvent);
 		});
 	}
 	RED.nodes.registerType("alexa-remote-event", AlexaRemoteEventNode);
