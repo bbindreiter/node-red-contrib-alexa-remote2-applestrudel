@@ -447,6 +447,13 @@ module.exports = function (RED) {
 
 					config.cookie = cookieData;
 					config.cookieJustCreated = !cookieData;
+
+					// Prefer the marketplace from saved cookie data (set by
+					// Amazon's getUserData) over the configured value.
+					if (cookieData && cookieData.amazonPage && cookieData.amazonPage !== config.amazonPage) {
+						this.warnCb(`amazonPage corrected: "${config.amazonPage}" → "${cookieData.amazonPage}"`);
+						config.amazonPage = cookieData.amazonPage;
+					}
 					break;
 				case 'cookie':
 					tools.assign(config, ['cookie'], this.credentials);
