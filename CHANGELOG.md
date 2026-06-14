@@ -1,4 +1,6 @@
 **node-red-contrib-alexa-remote2-applestrudel**
+- **5.0.59**
+    - fix: prevent proxy prompt during cookie auto-refresh by @gtalusan
 - **5.0.58**
     - persistent cookie auth fix by @gtalusan
 - **5.0.57**
