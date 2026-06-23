@@ -42,7 +42,7 @@ async function main() {
 		const AlexaRemoteExt = require('../lib/alexa-remote-ext');
 		const existingCookieData = {
 			loginCookie: 'login-cookie',
-			localCookie: 'csrf=old-csrf; session-id=old-session',
+			localCookie: 'csrf=old-csrf; session-id=old-session; ubid-main=old-ubid',
 			csrf: 'old-csrf',
 			refreshToken: 'refresh-token',
 			accessToken: 'access-token',
@@ -71,19 +71,23 @@ async function main() {
 			refreshAlexaCookie: (refreshOptions, callback) => callback(new Error('token refresh failed')),
 		};
 		alexa.auth = {
-			request: async () => ({
-				headers: {
-					'set-cookie': [
-						'csrf=new-csrf; Path=/; Secure',
-						'session-id=new-session; Path=/; Secure',
-					],
-				},
-			}),
+			request: async requestOptions => {
+				assert.strictEqual(requestOptions.headers.Cookie, 'csrf=old-csrf; session-id=old-session; ubid-main=old-ubid');
+				return {
+					headers: {
+						'set-cookie': [
+							'csrf=new-csrf; Path=/; Secure',
+							'session-id=new-session; Path=/; Secure',
+							'new-cookie=new-value; Path=/; Secure',
+						],
+					},
+				};
+			},
 		};
 
 		await alexa.refreshAlexaCookies();
 
-		assert.strictEqual(alexa.cookie, 'csrf=new-csrf; session-id=new-session');
+		assert.strictEqual(alexa.cookie, 'csrf=new-csrf; session-id=new-session; ubid-main=old-ubid; new-cookie=new-value');
 		assert.strictEqual(alexa.csrf, 'new-csrf');
 		assert.strictEqual(alexa.cookieData.loginCookie, existingCookieData.loginCookie);
 		assert.strictEqual(alexa.cookieData.refreshToken, existingCookieData.refreshToken);
@@ -97,7 +101,7 @@ async function main() {
 		assert.strictEqual(alexa._options.cookie, alexa.cookieData);
 		assert.strictEqual(alexa._options.formerRegistrationData, alexa.cookieData);
 		assert.deepStrictEqual(cookieEvents, [{
-			cookie: 'csrf=new-csrf; session-id=new-session',
+			cookie: 'csrf=new-csrf; session-id=new-session; ubid-main=old-ubid; new-cookie=new-value',
 			csrf: 'new-csrf',
 			macDms: 'mac-dms',
 		}]);
@@ -126,14 +130,17 @@ async function main() {
 			runtimeEvents.push({ cookie, csrf, macDms });
 		});
 		runtimeAlexa.auth = {
-			request: async () => ({
-				headers: {
-					'set-cookie': [
-						'csrf=runtime-csrf; Path=/; Secure',
-						'session-id=runtime-session; Path=/; Secure',
-					],
-				},
-			}),
+			request: async requestOptions => {
+				assert.strictEqual(requestOptions.headers.Cookie, runtimeCookieData.localCookie);
+				return {
+					headers: {
+						'set-cookie': [
+							'csrf=runtime-csrf; Path=/; Secure',
+							'session-id=runtime-session; Path=/; Secure',
+						],
+					},
+				};
+			},
 		};
 
 		await runtimeAlexa.refreshAlexaCookies();
@@ -182,16 +189,22 @@ async function main() {
 			refreshAlexaCookie: (refreshOptions, callback) => callback(new Error('token refresh failed')),
 		};
 		noCsrfAlexa.auth = {
-			request: async () => ({
-				headers: {
-					'set-cookie': [
-						'session-id=new-session; Path=/; Secure',
-					],
-				},
-			}),
+			request: async requestOptions => {
+				assert.strictEqual(requestOptions.headers.Cookie, noCsrfCookieData.localCookie);
+				return {
+					headers: {
+						'set-cookie': [
+							'session-id=new-session; Path=/; Secure',
+						],
+					},
+				};
+			},
 		};
 
-		await noCsrfAlexa.refreshAlexaCookies();
+		await assert.rejects(
+			() => noCsrfAlexa.refreshAlexaCookies(),
+			/Alexa SPA cookies did not include csrf/
+		);
 
 		assert.deepStrictEqual(noCsrfEvents, []);
 		assert.strictEqual(noCsrfAlexa.cookie, noCsrfCookieData.localCookie);
