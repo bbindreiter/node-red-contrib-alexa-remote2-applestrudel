@@ -50,7 +50,45 @@ async function testRequestWorksWithoutGlobalFetch() {
 	}
 }
 
-testRequestWorksWithoutGlobalFetch()
+async function testRequestKeepsCookiesAcrossRedirects() {
+	const seenCookieHeaders = [];
+
+	await withServer((req, res) => {
+		if (req.url === '/redirect') {
+			res.statusCode = 302;
+			res.setHeader('Location', '/final');
+			res.setHeader('Set-Cookie', 'csrf=redirect-csrf; Path=/; Secure');
+			res.end();
+			return;
+		}
+
+		assert.strictEqual(req.url, '/final');
+		seenCookieHeaders.push(req.headers.cookie || '');
+		res.setHeader('Set-Cookie', 'session-id=final-session; Path=/; Secure');
+		res.end('ok');
+	}, async baseUrl => {
+		const controller = new AlexaAuthController({}, {});
+		const response = await controller.request({
+			method: 'GET',
+			url: `${baseUrl}/redirect`,
+			headers: {
+				'User-Agent': 'test-agent',
+			},
+			followRedirect: true,
+		});
+
+		assert.strictEqual(response.statusCode, 200);
+		assert.deepStrictEqual(response.headers['set-cookie'], [
+			'csrf=redirect-csrf; Path=/; Secure',
+			'session-id=final-session; Path=/; Secure',
+		]);
+		assert.strictEqual(seenCookieHeaders[0], 'csrf=redirect-csrf');
+	});
+}
+
+Promise.resolve()
+	.then(testRequestWorksWithoutGlobalFetch)
+	.then(testRequestKeepsCookiesAcrossRedirects)
 	.then(() => console.log('auth-controller-request tests passed'))
 	.catch(error => {
 		console.error(error);
