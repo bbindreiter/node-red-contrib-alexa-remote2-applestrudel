@@ -15,6 +15,24 @@ class FakeAlexaRemote extends EventEmitter {
 		this.cookieData = cookieData;
 		this.cookie = cookieData.localCookie;
 		this.csrf = cookieData.csrf;
+		if (this.options) this.options.csrf = this.csrf;
+		if (this._options) this._options.csrf = this.csrf;
+	}
+}
+
+const hasOwn = (object, property) => Object.prototype.hasOwnProperty.call(object, property);
+
+function ownState(object, property) {
+	return {
+		hasOwn: hasOwn(object, property),
+		value: object[property],
+	};
+}
+
+function assertOwnState(object, property, expected, label) {
+	assert.strictEqual(hasOwn(object, property), expected.hasOwn, `${label} own property`);
+	if (expected.hasOwn) {
+		assert.strictEqual(object[property], expected.value, `${label} value`);
 	}
 }
 
@@ -400,6 +418,127 @@ async function main() {
 		assert.strictEqual(partialEmptySetCookieAlexa.macDms, partialEmptySetCookieData.macDms);
 		assert.strictEqual(partialEmptySetCookieOptions.cookie, partialEmptySetCookieData);
 		assert.strictEqual(partialEmptySetCookieAlexa._options.cookie, partialEmptySetCookieData);
+
+		const csrfRestoreCookieData = {
+			loginCookie: 'login-cookie',
+			localCookie: 'csrf=old-csrf; session-id=old-session',
+			csrf: 'old-csrf',
+			refreshToken: 'refresh-token',
+			macDms: 'old-mac-dms',
+		};
+		const csrfRestoreOptions = {
+			cookie: csrfRestoreCookieData,
+			csrf: 'primary-old-csrf',
+			amazonPage: 'amazon.com',
+			headers: {
+				Cookie: 'primary-old-cookie',
+				csrf: 'primary-header-csrf',
+			},
+			context: {
+				global: {
+					get: () => null,
+					set: () => {},
+				},
+			},
+		};
+		const csrfRestoreLegacyOptions = {
+			cookie: csrfRestoreCookieData,
+			csrf: 'legacy-old-csrf',
+			headers: {
+				Cookie: 'legacy-old-cookie',
+				csrf: 'legacy-header-csrf',
+			},
+			formerRegistrationData: csrfRestoreCookieData,
+			macDms: 'legacy-old-mac-dms',
+		};
+		const csrfRestoreAlexa = new AlexaRemoteExt(csrfRestoreOptions);
+		csrfRestoreAlexa._options = csrfRestoreLegacyOptions;
+		csrfRestoreAlexa.cookie = csrfRestoreCookieData.localCookie;
+		csrfRestoreAlexa.csrf = csrfRestoreCookieData.csrf;
+		csrfRestoreAlexa.macDms = csrfRestoreCookieData.macDms;
+		const csrfRestoreBefore = {
+			primaryCsrf: ownState(csrfRestoreOptions, 'csrf'),
+			legacyCsrf: ownState(csrfRestoreLegacyOptions, 'csrf'),
+			primaryHeaderCookie: ownState(csrfRestoreOptions.headers, 'Cookie'),
+			primaryHeaderCsrf: ownState(csrfRestoreOptions.headers, 'csrf'),
+			legacyHeaderCookie: ownState(csrfRestoreLegacyOptions.headers, 'Cookie'),
+			legacyHeaderCsrf: ownState(csrfRestoreLegacyOptions.headers, 'csrf'),
+		};
+		csrfRestoreAlexa.alexaCookie = {
+			refreshAlexaCookie: (refreshOptions, callback) => callback(null, badNativeRefresh),
+		};
+		csrfRestoreAlexa.auth = {
+			request: async () => ({ headers: { 'set-cookie': [] } }),
+		};
+
+		await assert.rejects(
+			() => csrfRestoreAlexa.refreshAlexaCookies(),
+			/No Alexa cookies received/
+		);
+		assertOwnState(csrfRestoreOptions, 'csrf', csrfRestoreBefore.primaryCsrf, 'primary options csrf');
+		assertOwnState(csrfRestoreLegacyOptions, 'csrf', csrfRestoreBefore.legacyCsrf, 'legacy options csrf');
+		assertOwnState(csrfRestoreOptions.headers, 'Cookie', csrfRestoreBefore.primaryHeaderCookie, 'primary header Cookie');
+		assertOwnState(csrfRestoreOptions.headers, 'csrf', csrfRestoreBefore.primaryHeaderCsrf, 'primary header csrf');
+		assertOwnState(csrfRestoreLegacyOptions.headers, 'Cookie', csrfRestoreBefore.legacyHeaderCookie, 'legacy header Cookie');
+		assertOwnState(csrfRestoreLegacyOptions.headers, 'csrf', csrfRestoreBefore.legacyHeaderCsrf, 'legacy header csrf');
+
+		const propertyShapeCookieData = {
+			loginCookie: 'login-cookie',
+			localCookie: 'csrf=shape-old-csrf; session-id=shape-old-session',
+			csrf: 'shape-old-csrf',
+			refreshToken: 'refresh-token',
+			macDms: 'shape-old-mac-dms',
+		};
+		const propertyShapeOptions = {
+			cookie: propertyShapeCookieData,
+			amazonPage: 'amazon.com',
+			headers: {},
+			context: {
+				global: {
+					get: () => null,
+					set: () => {},
+				},
+			},
+		};
+		const propertyShapeLegacyOptions = {
+			cookie: propertyShapeCookieData,
+			csrf: undefined,
+			headers: {
+				Cookie: undefined,
+				csrf: undefined,
+			},
+			formerRegistrationData: propertyShapeCookieData,
+		};
+		const propertyShapeAlexa = new AlexaRemoteExt(propertyShapeOptions);
+		propertyShapeAlexa._options = propertyShapeLegacyOptions;
+		propertyShapeAlexa.cookie = propertyShapeCookieData.localCookie;
+		propertyShapeAlexa.csrf = propertyShapeCookieData.csrf;
+		propertyShapeAlexa.macDms = propertyShapeCookieData.macDms;
+		const propertyShapeBefore = {
+			primaryCsrf: ownState(propertyShapeOptions, 'csrf'),
+			legacyCsrf: ownState(propertyShapeLegacyOptions, 'csrf'),
+			primaryHeaderCookie: ownState(propertyShapeOptions.headers, 'Cookie'),
+			primaryHeaderCsrf: ownState(propertyShapeOptions.headers, 'csrf'),
+			legacyHeaderCookie: ownState(propertyShapeLegacyOptions.headers, 'Cookie'),
+			legacyHeaderCsrf: ownState(propertyShapeLegacyOptions.headers, 'csrf'),
+		};
+		propertyShapeAlexa.alexaCookie = {
+			refreshAlexaCookie: (refreshOptions, callback) => callback(null, badNativeRefresh),
+		};
+		propertyShapeAlexa.auth = {
+			request: async () => ({}),
+		};
+
+		await assert.rejects(
+			() => propertyShapeAlexa.refreshAlexaCookies(),
+			/No response headers from Alexa SPA/
+		);
+		assertOwnState(propertyShapeOptions, 'csrf', propertyShapeBefore.primaryCsrf, 'missing primary options csrf');
+		assertOwnState(propertyShapeLegacyOptions, 'csrf', propertyShapeBefore.legacyCsrf, 'undefined legacy options csrf');
+		assertOwnState(propertyShapeOptions.headers, 'Cookie', propertyShapeBefore.primaryHeaderCookie, 'missing primary header Cookie');
+		assertOwnState(propertyShapeOptions.headers, 'csrf', propertyShapeBefore.primaryHeaderCsrf, 'missing primary header csrf');
+		assertOwnState(propertyShapeLegacyOptions.headers, 'Cookie', propertyShapeBefore.legacyHeaderCookie, 'undefined legacy header Cookie');
+		assertOwnState(propertyShapeLegacyOptions.headers, 'csrf', propertyShapeBefore.legacyHeaderCsrf, 'undefined legacy header csrf');
 	}
 	finally {
 		Module._load = originalLoad;
