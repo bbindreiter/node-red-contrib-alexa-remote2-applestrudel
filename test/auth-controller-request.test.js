@@ -73,6 +73,7 @@ async function testRequestKeepsCookiesAcrossRedirects() {
 			url: `${baseUrl}/redirect`,
 			headers: {
 				'User-Agent': 'test-agent',
+				Cookie: 'csrf=old-csrf; ubid-main=old-ubid',
 			},
 			followRedirect: true,
 		});
@@ -82,7 +83,7 @@ async function testRequestKeepsCookiesAcrossRedirects() {
 			'csrf=redirect-csrf; Path=/; Secure',
 			'session-id=final-session; Path=/; Secure',
 		]);
-		assert.strictEqual(seenCookieHeaders[0], 'csrf=redirect-csrf');
+		assert.strictEqual(seenCookieHeaders[0], 'csrf=redirect-csrf; ubid-main=old-ubid');
 	});
 }
 
