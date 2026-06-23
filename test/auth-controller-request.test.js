@@ -87,9 +87,41 @@ async function testRequestKeepsCookiesAcrossRedirects() {
 	});
 }
 
+async function testRequestKeepsLowercaseCookieHeaderAcrossRedirects() {
+	const seenCookieHeaders = [];
+
+	await withServer((req, res) => {
+		if (req.url === '/redirect') {
+			res.statusCode = 302;
+			res.setHeader('Location', '/final');
+			res.setHeader('Set-Cookie', 'csrf=redirect-csrf; Path=/; Secure');
+			res.end();
+			return;
+		}
+
+		assert.strictEqual(req.url, '/final');
+		seenCookieHeaders.push(req.headers.cookie || '');
+		res.end('ok');
+	}, async baseUrl => {
+		const controller = new AlexaAuthController({}, {});
+		await controller.request({
+			method: 'GET',
+			url: `${baseUrl}/redirect`,
+			headers: {
+				'User-Agent': 'test-agent',
+				cookie: 'csrf=old-csrf; ubid-main=old-ubid',
+			},
+			followRedirect: true,
+		});
+
+		assert.strictEqual(seenCookieHeaders[0], 'csrf=redirect-csrf; ubid-main=old-ubid');
+	});
+}
+
 Promise.resolve()
 	.then(testRequestWorksWithoutGlobalFetch)
 	.then(testRequestKeepsCookiesAcrossRedirects)
+	.then(testRequestKeepsLowercaseCookieHeaderAcrossRedirects)
 	.then(() => console.log('auth-controller-request tests passed'))
 	.catch(error => {
 		console.error(error);
