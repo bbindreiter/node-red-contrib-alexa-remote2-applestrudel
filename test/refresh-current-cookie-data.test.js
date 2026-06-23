@@ -122,16 +122,17 @@ async function testRefreshIgnoresCurrentCookieDataWithoutLoginCookie() {
 	assert.strictEqual(initInput, undefined);
 }
 
-async function testRefreshKeepsFileBasedProxyInputEmpty() {
+async function testRefreshUsesCurrentProxyCookieDataWithCookieFile() {
 	const account = createAccount({
 		authMethod: 'proxy',
 		cookieFile: '/tmp/alexa-cookie.json',
 	});
 
-	account.alexa.cookieData = createProxyCookieData();
+	const currentCookieData = createProxyCookieData();
+	account.alexa.cookieData = currentCookieData;
 	const initInput = await captureRefreshInitInput(account);
 
-	assert.strictEqual(initInput, undefined);
+	assert.deepStrictEqual(initInput, currentCookieData);
 }
 
 async function testRefreshKeepsCookieAuthInputEmpty() {
@@ -148,7 +149,7 @@ async function testRefreshKeepsCookieAuthInputEmpty() {
 Promise.resolve()
 	.then(testRefreshUsesCurrentProxyCookieData)
 	.then(testRefreshIgnoresCurrentCookieDataWithoutLoginCookie)
-	.then(testRefreshKeepsFileBasedProxyInputEmpty)
+	.then(testRefreshUsesCurrentProxyCookieDataWithCookieFile)
 	.then(testRefreshKeepsCookieAuthInputEmpty)
 	.then(() => {
 		console.log('refresh-current-cookie-data tests passed');

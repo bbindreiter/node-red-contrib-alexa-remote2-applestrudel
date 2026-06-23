@@ -546,7 +546,6 @@ module.exports = function (RED) {
 
 			let cookieData;
 			if(this.authMethod === 'proxy'
-					&& !this.cookieFile
 					&& this.alexa
 					&& tools.isObject(this.alexa.cookieData)
 					&& this.alexa.cookieData.loginCookie) {
