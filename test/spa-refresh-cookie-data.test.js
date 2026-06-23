@@ -149,6 +149,51 @@ async function main() {
 		assert.strictEqual(runtimeAlexa.cookieData.csrf, 'runtime-csrf');
 		assert.strictEqual(runtimeAlexa._options.cookie, runtimeAlexa.cookieData);
 		assert.strictEqual(runtimeAlexa._options.formerRegistrationData, runtimeAlexa.cookieData);
+
+		const noCsrfCookieData = {
+			loginCookie: 'login-cookie',
+			localCookie: 'csrf=old-csrf; session-id=old-session',
+			csrf: 'old-csrf',
+			refreshToken: 'refresh-token',
+			macDms: 'mac-dms',
+		};
+		const noCsrfOptions = {
+			cookie: noCsrfCookieData,
+			amazonPage: 'amazon.com',
+			context: {
+				global: {
+					get: () => null,
+					set: () => {},
+				},
+			},
+		};
+		const noCsrfAlexa = new AlexaRemoteExt(noCsrfOptions);
+		const noCsrfEvents = [];
+		noCsrfAlexa.on('cookie', (cookie, csrf, macDms) => {
+			noCsrfEvents.push({ cookie, csrf, macDms });
+		});
+		noCsrfAlexa.alexaCookie = {
+			refreshAlexaCookie: (refreshOptions, callback) => callback(new Error('token refresh failed')),
+		};
+		noCsrfAlexa.auth = {
+			request: async () => ({
+				headers: {
+					'set-cookie': [
+						'session-id=new-session; Path=/; Secure',
+					],
+				},
+			}),
+		};
+
+		await noCsrfAlexa.refreshAlexaCookies();
+
+		assert.deepStrictEqual(noCsrfEvents, []);
+		assert.strictEqual(noCsrfAlexa.cookie, 'session-id=new-session');
+		assert.strictEqual(noCsrfAlexa.csrf, null);
+		assert.strictEqual(noCsrfAlexa.cookieData, noCsrfCookieData);
+		assert.strictEqual(noCsrfAlexa._options.cookie, noCsrfCookieData);
+		assert.strictEqual(noCsrfAlexa._options.headers.Cookie, 'session-id=new-session');
+		assert.strictEqual(noCsrfAlexa._options.headers.csrf, null);
 	}
 	finally {
 		Module._load = originalLoad;
