@@ -292,6 +292,7 @@ async function main() {
 		const partialRefreshAlexa = new AlexaRemoteExt(partialRefreshOptions);
 		partialRefreshAlexa.cookie = partialRefreshCookieData.localCookie;
 		partialRefreshAlexa.csrf = partialRefreshCookieData.csrf;
+		partialRefreshAlexa.macDms = partialRefreshCookieData.macDms;
 		const badNativeRefresh = {
 			loginCookie: 'login-cookie',
 			localCookie: 'session-id=partial-session',
@@ -318,8 +319,87 @@ async function main() {
 		assert.strictEqual(partialRefreshAlexa.cookie, partialRefreshCookieData.localCookie);
 		assert.strictEqual(partialRefreshAlexa.csrf, partialRefreshCookieData.csrf);
 		assert.strictEqual(partialRefreshAlexa.cookieData, partialRefreshCookieData);
+		assert.strictEqual(partialRefreshAlexa.macDms, partialRefreshCookieData.macDms);
 		assert.strictEqual(partialRefreshOptions.cookie, partialRefreshCookieData);
 		assert.strictEqual(partialRefreshAlexa._options.cookie, partialRefreshCookieData);
+
+		const partialMissingHeadersCookieData = {
+			loginCookie: 'login-cookie',
+			localCookie: 'csrf=old-csrf; session-id=old-session',
+			csrf: 'old-csrf',
+			refreshToken: 'refresh-token',
+			macDms: 'old-mac-dms',
+		};
+		const partialMissingHeadersOptions = {
+			cookie: partialMissingHeadersCookieData,
+			amazonPage: 'amazon.com',
+			context: {
+				global: {
+					get: () => null,
+					set: () => {},
+				},
+			},
+		};
+		const partialMissingHeadersAlexa = new AlexaRemoteExt(partialMissingHeadersOptions);
+		partialMissingHeadersAlexa.cookie = partialMissingHeadersCookieData.localCookie;
+		partialMissingHeadersAlexa.csrf = partialMissingHeadersCookieData.csrf;
+		partialMissingHeadersAlexa.macDms = partialMissingHeadersCookieData.macDms;
+		partialMissingHeadersAlexa.alexaCookie = {
+			refreshAlexaCookie: (refreshOptions, callback) => callback(null, badNativeRefresh),
+		};
+		partialMissingHeadersAlexa.auth = {
+			request: async () => ({}),
+		};
+
+		await assert.rejects(
+			() => partialMissingHeadersAlexa.refreshAlexaCookies(),
+			/No response headers from Alexa SPA/
+		);
+		assert.strictEqual(partialMissingHeadersAlexa.cookie, partialMissingHeadersCookieData.localCookie);
+		assert.strictEqual(partialMissingHeadersAlexa.csrf, partialMissingHeadersCookieData.csrf);
+		assert.strictEqual(partialMissingHeadersAlexa.cookieData, partialMissingHeadersCookieData);
+		assert.strictEqual(partialMissingHeadersAlexa.macDms, partialMissingHeadersCookieData.macDms);
+		assert.strictEqual(partialMissingHeadersOptions.cookie, partialMissingHeadersCookieData);
+		assert.strictEqual(partialMissingHeadersAlexa._options.cookie, partialMissingHeadersCookieData);
+
+		const partialEmptySetCookieData = {
+			loginCookie: 'login-cookie',
+			localCookie: 'csrf=old-csrf; session-id=old-session',
+			csrf: 'old-csrf',
+			refreshToken: 'refresh-token',
+			macDms: 'old-mac-dms',
+		};
+		const partialEmptySetCookieOptions = {
+			cookie: partialEmptySetCookieData,
+			amazonPage: 'amazon.com',
+			context: {
+				global: {
+					get: () => null,
+					set: () => {},
+				},
+			},
+		};
+		const partialEmptySetCookieAlexa = new AlexaRemoteExt(partialEmptySetCookieOptions);
+		partialEmptySetCookieAlexa.cookie = partialEmptySetCookieData.localCookie;
+		partialEmptySetCookieAlexa.csrf = partialEmptySetCookieData.csrf;
+		partialEmptySetCookieAlexa.macDms = partialEmptySetCookieData.macDms;
+		partialEmptySetCookieAlexa.alexaCookie = {
+			refreshAlexaCookie: (refreshOptions, callback) => callback(null, badNativeRefresh),
+		};
+		partialEmptySetCookieAlexa.auth = {
+			request: async () => ({ headers: { 'set-cookie': [] } }),
+		};
+
+		await assert.rejects(
+			() => partialEmptySetCookieAlexa.refreshAlexaCookies(),
+			/No Alexa cookies received/
+		);
+		assert.strictEqual(partialEmptySetCookieAlexa.cookie, partialEmptySetCookieData.localCookie);
+		assert.strictEqual(partialEmptySetCookieAlexa.csrf, partialEmptySetCookieData.csrf);
+		assert.strictEqual(partialEmptySetCookieAlexa.cookieData, partialEmptySetCookieData);
+		assert.strictEqual(partialEmptySetCookieAlexa.macDms, partialEmptySetCookieData.macDms);
+		assert.strictEqual(partialEmptySetCookieOptions.cookie, partialEmptySetCookieData);
+		assert.strictEqual(partialEmptySetCookieAlexa._options.cookie, partialEmptySetCookieData);
 	}
 	finally {
 		Module._load = originalLoad;
