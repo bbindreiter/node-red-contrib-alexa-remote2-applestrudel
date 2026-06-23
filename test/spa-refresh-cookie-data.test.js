@@ -213,6 +213,113 @@ async function main() {
 		assert.strictEqual(noCsrfAlexa._options.cookie, noCsrfCookieData);
 		assert.strictEqual(noCsrfAlexa._options.headers.Cookie, noCsrfCookieData.localCookie);
 		assert.strictEqual(noCsrfAlexa._options.headers.csrf, noCsrfCookieData.csrf);
+
+		const missingUserAgentCookieData = {
+			loginCookie: 'login-cookie',
+			localCookie: 'csrf=old-csrf; session-id=old-session',
+			csrf: 'old-csrf',
+			refreshToken: 'refresh-token',
+		};
+		const missingUserAgentAlexa = new AlexaRemoteExt({
+			cookie: missingUserAgentCookieData,
+			amazonPage: 'amazon.com',
+			context: {
+				global: {
+					get: () => null,
+					set: () => {},
+				},
+			},
+		});
+		missingUserAgentAlexa.alexaCookie = {
+			refreshAlexaCookie: (refreshOptions, callback) => callback(new Error('token refresh failed')),
+		};
+		missingUserAgentAlexa.auth = {
+			request: async requestOptions => {
+				assert(!Object.prototype.hasOwnProperty.call(requestOptions.headers, 'User-Agent'));
+				assert.strictEqual(requestOptions.headers.Cookie, missingUserAgentCookieData.localCookie);
+				return {
+					headers: {
+						'set-cookie': [
+							'csrf=fresh-csrf; Path=/; Secure',
+						],
+					},
+				};
+			},
+		};
+
+		await missingUserAgentAlexa.refreshAlexaCookies();
+		assert.strictEqual(missingUserAgentAlexa.cookie, 'csrf=fresh-csrf; session-id=old-session');
+
+		const emptySetCookieAlexa = new AlexaRemoteExt({
+			cookie: missingUserAgentCookieData,
+			amazonPage: 'amazon.com',
+			context: {
+				global: {
+					get: () => null,
+					set: () => {},
+				},
+			},
+		});
+		emptySetCookieAlexa.alexaCookie = {
+			refreshAlexaCookie: (refreshOptions, callback) => callback(new Error('token refresh failed')),
+		};
+		emptySetCookieAlexa.auth = {
+			request: async () => ({ headers: { 'set-cookie': [] } }),
+		};
+
+		await assert.rejects(
+			() => emptySetCookieAlexa.refreshAlexaCookies(),
+			/No Alexa cookies received/
+		);
+
+		const partialRefreshCookieData = {
+			loginCookie: 'login-cookie',
+			localCookie: 'csrf=old-csrf; session-id=old-session',
+			csrf: 'old-csrf',
+			refreshToken: 'refresh-token',
+			macDms: 'old-mac-dms',
+		};
+		const partialRefreshOptions = {
+			cookie: partialRefreshCookieData,
+			amazonPage: 'amazon.com',
+			context: {
+				global: {
+					get: () => null,
+					set: () => {},
+				},
+			},
+		};
+		const partialRefreshAlexa = new AlexaRemoteExt(partialRefreshOptions);
+		partialRefreshAlexa.cookie = partialRefreshCookieData.localCookie;
+		partialRefreshAlexa.csrf = partialRefreshCookieData.csrf;
+		const badNativeRefresh = {
+			loginCookie: 'login-cookie',
+			localCookie: 'session-id=partial-session',
+			refreshToken: 'refresh-token',
+			macDms: 'partial-mac-dms',
+		};
+		partialRefreshAlexa.alexaCookie = {
+			refreshAlexaCookie: (refreshOptions, callback) => callback(null, badNativeRefresh),
+		};
+		partialRefreshAlexa.auth = {
+			request: async () => ({
+				headers: {
+					'set-cookie': [
+						'session-id=new-session; Path=/; Secure',
+					],
+				},
+			}),
+		};
+
+		await assert.rejects(
+			() => partialRefreshAlexa.refreshAlexaCookies(),
+			/Alexa SPA cookies did not include csrf/
+		);
+		assert.strictEqual(partialRefreshAlexa.cookie, partialRefreshCookieData.localCookie);
+		assert.strictEqual(partialRefreshAlexa.csrf, partialRefreshCookieData.csrf);
+		assert.strictEqual(partialRefreshAlexa.cookieData, partialRefreshCookieData);
+		assert.strictEqual(partialRefreshOptions.cookie, partialRefreshCookieData);
+		assert.strictEqual(partialRefreshAlexa._options.cookie, partialRefreshCookieData);
 	}
 	finally {
 		Module._load = originalLoad;
