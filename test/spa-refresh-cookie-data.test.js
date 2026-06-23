@@ -160,6 +160,10 @@ async function main() {
 		const noCsrfOptions = {
 			cookie: noCsrfCookieData,
 			amazonPage: 'amazon.com',
+			headers: {
+				Cookie: noCsrfCookieData.localCookie,
+				csrf: noCsrfCookieData.csrf,
+			},
 			context: {
 				global: {
 					get: () => null,
@@ -168,6 +172,8 @@ async function main() {
 			},
 		};
 		const noCsrfAlexa = new AlexaRemoteExt(noCsrfOptions);
+		noCsrfAlexa.cookie = noCsrfCookieData.localCookie;
+		noCsrfAlexa.csrf = noCsrfCookieData.csrf;
 		const noCsrfEvents = [];
 		noCsrfAlexa.on('cookie', (cookie, csrf, macDms) => {
 			noCsrfEvents.push({ cookie, csrf, macDms });
@@ -188,12 +194,12 @@ async function main() {
 		await noCsrfAlexa.refreshAlexaCookies();
 
 		assert.deepStrictEqual(noCsrfEvents, []);
-		assert.strictEqual(noCsrfAlexa.cookie, 'session-id=new-session');
-		assert.strictEqual(noCsrfAlexa.csrf, null);
+		assert.strictEqual(noCsrfAlexa.cookie, noCsrfCookieData.localCookie);
+		assert.strictEqual(noCsrfAlexa.csrf, noCsrfCookieData.csrf);
 		assert.strictEqual(noCsrfAlexa.cookieData, noCsrfCookieData);
 		assert.strictEqual(noCsrfAlexa._options.cookie, noCsrfCookieData);
-		assert.strictEqual(noCsrfAlexa._options.headers.Cookie, 'session-id=new-session');
-		assert.strictEqual(noCsrfAlexa._options.headers.csrf, null);
+		assert.strictEqual(noCsrfAlexa._options.headers.Cookie, noCsrfCookieData.localCookie);
+		assert.strictEqual(noCsrfAlexa._options.headers.csrf, noCsrfCookieData.csrf);
 	}
 	finally {
 		Module._load = originalLoad;
