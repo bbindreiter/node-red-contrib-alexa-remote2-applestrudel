@@ -544,8 +544,16 @@ module.exports = function (RED) {
 			if(this.state.code !== 'READY') throw new Error('account must be initialised before refreshing');
 			this.setState('REFRESH');
 
+			let cookieData;
+			if(this.authMethod === 'proxy'
+					&& this.alexa
+					&& tools.isObject(this.alexa.cookieData)
+					&& this.alexa.cookieData.loginCookie) {
+				cookieData = this.alexa.cookieData;
+			}
+
 			//return this.alexa.refreshExt().then(value => {
-			return this.initAlexa(undefined).then(value => {
+			return this.initAlexa(cookieData).then(value => {
 				this.setState('READY');
 				this.renewTimeout();
 				return value;
