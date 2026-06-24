@@ -483,7 +483,10 @@ module.exports = function (RED) {
 			this.logCb(`intialising ${this.name ? `"${this.name}" ` : ''}with the ${initType.toUpperCase()} method and ${config.cookie ? '' : 'NO '}saved data...`);
 
 			this.debugCb(`Alexa-Remote: starting initialisation:`);
-			this.debugCb(`Alexa-Remote: ${JSON.stringify({authMethod: this.authMethod, initType: initType, cookie: config.cookie})}`);
+			const debugCookie = config.cookie
+				? { present: true, type: Array.isArray(config.cookie) ? 'array' : typeof config.cookie }
+				: { present: false };
+			this.debugCb(`Alexa-Remote: ${JSON.stringify({ authMethod: this.authMethod, initType: initType, cookie: debugCookie })}`);
 
 			// the this.alexa we init could change once the this.alexa.initExt is complete because
 			// this.resetAlexa() or this.initAlexa() might have been called again during this time
