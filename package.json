@@ -1,11 +1,15 @@
 {
 	"name": "node-red-contrib-alexa-remote2-applestrudel",
-	"version": "5.0.59",
+	"version": "5.1.0",
 	"author": {
 		"name": "bbindreiter",
 		"email": "bernd.bindreiter@gmail.com"
 	},
 	"contributors": [
+        {
+          "name": "fkhr79",
+          "url": "https://github.com/fkhr79"
+        },
 		{
 			"name": "Julian Wiche",
 			"url": "https://github.com/dajuly20"

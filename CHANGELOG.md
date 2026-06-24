@@ -1,4 +1,10 @@
 **node-red-contrib-alexa-remote2-applestrudel**
+- **5.1.0**
+    - fix: return cookie data from initExt by @fkhr79 in https://github.com/bbindreiter/node-red-contrib-alexa-remote2-applestrudel/pull/258
+    - fix: keep refresh cookie state consistent by @fkhr79 in https://github.com/bbindreiter/node-red-contrib-alexa-remote2-applestrudel/pull/259
+    - fix: use current cookie data during refresh by @fkhr79 in https://github.com/bbindreiter/node-red-contrib-alexa-remote2-applestrudel/pull/260
+    - fix: keep cookies across auth redirects by @fkhr79 in https://github.com/bbindreiter/node-red-contrib-alexa-remote2-applestrudel/pull/262
+    - fix: redact cookie data in account debug output by @fkhr79 in https://github.com/bbindreiter/node-red-contrib-alexa-remote2-applestrudel/pull/263
 - **5.0.59**
     - fix: prevent proxy prompt during cookie auto-refresh by @gtalusan
 - **5.0.58**
