@@ -447,6 +447,13 @@ module.exports = function (RED) {
 
 					config.cookie = cookieData;
 					config.cookieJustCreated = !cookieData;
+
+					// Prefer the marketplace from saved cookie data (set by
+					// Amazon's getUserData) over the configured value.
+					if (cookieData && cookieData.amazonPage && cookieData.amazonPage !== config.amazonPage) {
+						this.warnCb(`amazonPage corrected: "${config.amazonPage}" → "${cookieData.amazonPage}"`);
+						config.amazonPage = cookieData.amazonPage;
+					}
 					break;
 				case 'cookie':
 					tools.assign(config, ['cookie'], this.credentials);
@@ -476,7 +483,10 @@ module.exports = function (RED) {
 			this.logCb(`intialising ${this.name ? `"${this.name}" ` : ''}with the ${initType.toUpperCase()} method and ${config.cookie ? '' : 'NO '}saved data...`);
 
 			this.debugCb(`Alexa-Remote: starting initialisation:`);
-			this.debugCb(`Alexa-Remote: ${JSON.stringify({authMethod: this.authMethod, initType: initType, cookie: config.cookie})}`);
+			const debugCookie = config.cookie
+				? { present: true, type: Array.isArray(config.cookie) ? 'array' : typeof config.cookie }
+				: { present: false };
+			this.debugCb(`Alexa-Remote: ${JSON.stringify({ authMethod: this.authMethod, initType: initType, cookie: debugCookie })}`);
 
 			// the this.alexa we init could change once the this.alexa.initExt is complete because
 			// this.resetAlexa() or this.initAlexa() might have been called again during this time
@@ -537,8 +547,16 @@ module.exports = function (RED) {
 			if(this.state.code !== 'READY') throw new Error('account must be initialised before refreshing');
 			this.setState('REFRESH');
 
+			let cookieData;
+			if(this.authMethod === 'proxy'
+					&& this.alexa
+					&& tools.isObject(this.alexa.cookieData)
+					&& this.alexa.cookieData.loginCookie) {
+				cookieData = this.alexa.cookieData;
+			}
+
 			//return this.alexa.refreshExt().then(value => {
-			return this.initAlexa(undefined).then(value => {
+			return this.initAlexa(cookieData).then(value => {
 				this.setState('READY');
 				this.renewTimeout();
 				return value;
