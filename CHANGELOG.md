@@ -1,4 +1,6 @@
 **node-red-contrib-alexa-remote2-applestrudel**
+- **5.1.1**
+    - Updates dependency alexa-remote2 to v8.0.6
 - **5.1.0**
     - fix: return cookie data from initExt by @fkhr79 in https://github.com/bbindreiter/node-red-contrib-alexa-remote2-applestrudel/pull/258
     - fix: keep refresh cookie state consistent by @fkhr79 in https://github.com/bbindreiter/node-red-contrib-alexa-remote2-applestrudel/pull/259
@@ -16,10 +18,10 @@
 - **5.0.55**
   - fix: Get Lists and Remove List Item https://github.com/bbindreiter/node-red-contrib-alexa-remote2-applestrudel/pull/235
 - **5.0.54**
-  - Updates dependency alexa-remote2 to v8.0.4"
+  - Updates dependency alexa-remote2 to v8.0.4
   - Fix authentication
 - **5.0.53**
-  - Updates dependency alexa-remote2 to v8.0.2"
+  - Updates dependency alexa-remote2 to v8.0.2
 - **5.0.52**
   - Updates dependency alexa-remote2 to v8.0.0
 - **5.0.51**
